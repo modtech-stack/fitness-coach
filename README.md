@@ -1,58 +1,138 @@
 # AI Fitness Trainer
 
-AI Fitness Trainer — система управления персональным тренировочным процессом. Она помогает сформировать проверяемую программу, выполнить запланированную тренировку и адаптировать нагрузку на основе состояния пользователя.
-
-Критические решения принимает прозрачный Training Engine. AI используется для создания черновика программы и объяснения решений, но не заменяет safety-правила и медицинского специалиста.
+AI Fitness Trainer — система управления персональным тренировочным процессом. Она помогает собрать контекст пользователя, сформировать проверяемую программу и в следующих этапах адаптировать нагрузку на основе прозрачных правил.
 
 ## Текущий статус
 
-**Phase 0 — Product Architecture / Source of Truth Consolidation.**
+**Stage 1 — Domain Foundation.**
 
-Приложение ещё не реализовано. Next.js, Supabase и OpenAI API на этом этапе не подключены.
+Реализованы:
 
-## Структура репозитория
+- Next.js 16 и TypeScript;
+- Supabase PostgreSQL, Auth и локальные миграции;
+- сущности `profiles`, `goals`, `constraints`;
+- Row Level Security для изоляции данных пользователей;
+- onboarding `регистрация → профиль → цель → ограничения`;
+- unit-тесты доменной валидации и pgTAP-тесты схемы/RLS.
+
+Пока не реализованы GPT Program Builder, OpenAI API, Training Engine, Polar и расширенная аналитика.
+
+## Технологии
+
+- Next.js App Router;
+- React и TypeScript;
+- Supabase PostgreSQL + Auth + RLS;
+- Tailwind CSS;
+- Zod;
+- Vitest и pgTAP.
+
+Требуется Node.js 20.9 или новее. Для локального Supabase нужен Docker-совместимый runtime.
+
+## Локальный запуск
+
+1. Установите зависимости:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Запустите локальный Supabase:
+
+   ```bash
+   pnpm db:start
+   ```
+
+3. Создайте локальный env-файл:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Значения URL и publishable key возьмите из:
+
+   ```bash
+   pnpm exec supabase status -o env
+   ```
+
+4. Примените миграции с чистого состояния:
+
+   ```bash
+   pnpm db:reset
+   ```
+
+5. Запустите приложение:
+
+   ```bash
+   pnpm dev
+   ```
+
+   Откройте [http://localhost:3000](http://localhost:3000).
+
+Локальная конфигурация отключает обязательное подтверждение email. В hosted Supabase приложение корректно обрабатывает сценарий, когда сначала нужно подтвердить адрес.
+
+## Проверки
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm db:test
+```
+
+`pnpm db:test` требует запущенный локальный Supabase и проверяет:
+
+- создание тестовых пользователей;
+- сохранение профиля, цели и ограничения;
+- изменение собственных данных;
+- невозможность пользователя A увидеть данные пользователя B.
+
+## Подключение hosted Supabase
+
+После создания отдельного dev-проекта:
+
+```bash
+pnpm exec supabase login
+pnpm exec supabase link --project-ref <project-ref>
+pnpm exec supabase db push --dry-run
+pnpm exec supabase db push
+```
+
+Секреты и реальные пользовательские данные не добавляются в Git.
+
+## Структура
 
 ```text
 .
-├── README.md
-├── docs/
-│   ├── 00_project_rules.md
-│   ├── 01_product_vision.md
-│   ├── 02_core_model.md
-│   ├── 03_mvp_specification.md
-│   ├── 04_database_schema.md
-│   ├── 05_training_engine.md
-│   ├── 06_codex_instructions.md
-│   ├── 07_program_builder.md
-│   ├── 08_implementation_plan.md
-│   └── DECISIONS.md
-├── knowledge/
-│   └── training/
-│       └── training_engine_principles_v0.9.md
-└── profiles/
-    └── examples/
-        ├── boris.example.md
-        └── alena.example.md
+├── src/
+│   ├── app/                  # страницы и маршруты App Router
+│   ├── features/
+│   │   ├── auth/             # регистрация и вход
+│   │   └── onboarding/       # профиль, цели, ограничения
+│   ├── lib/
+│   │   ├── auth/
+│   │   └── supabase/         # browser/server/proxy clients
+│   ├── types/
+│   └── proxy.ts              # обновление Auth-сессии
+├── supabase/
+│   ├── migrations/           # версионируемая схема PostgreSQL
+│   ├── tests/database/       # pgTAP и RLS
+│   ├── config.toml
+│   └── seed.sql
+├── docs/                     # продуктовые и архитектурные документы
+├── knowledge/                # принципы Training Engine
+└── profiles/examples/        # только синтетические профили
 ```
 
-## Порядок чтения
+## Порядок чтения документации
 
 1. [Project Rules](docs/00_project_rules.md)
 2. [Product Vision](docs/01_product_vision.md)
 3. [Core Model](docs/02_core_model.md)
 4. [MVP Specification](docs/03_mvp_specification.md)
 5. [Architecture Decisions](docs/DECISIONS.md)
-6. [Training Engine Principles](knowledge/training/training_engine_principles_v0.9.md)
-7. [GPT Program Builder](docs/07_program_builder.md)
-8. [Database Schema](docs/04_database_schema.md)
-9. [Training Engine Specification status](docs/05_training_engine.md)
-10. [Implementation Plan](docs/08_implementation_plan.md)
-11. [Codex Development Instructions](docs/06_codex_instructions.md)
+6. [Database Schema](docs/04_database_schema.md)
+7. [Implementation Plan](docs/08_implementation_plan.md)
+8. [Training Engine Principles](knowledge/training/training_engine_principles_v0.9.md)
 
-## Источник истины
-
-Ветка `main` является единственным источником актуальной документации. Тематические ветки могут использоваться только временно для подготовки изменений через Pull Request.
-
-## Конфиденциальность
-
-Реальные пользовательские, медицинские и биометрические данные не хранятся в репозитории. Файлы в [`profiles/examples/`](profiles/examples/) являются синтетическими примерами.
+Ветка `main` является единственным источником актуальной документации. Реальные медицинские, биометрические, контактные и другие конфиденциальные данные в репозитории не хранятся.

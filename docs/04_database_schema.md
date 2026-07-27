@@ -1,6 +1,12 @@
 # AI Fitness Trainer
 # Database Schema v1.0
 
+> **Статус реализации:** Этап 1 реализует минимальный домен
+> `profiles`, `goals`, `constraints` в миграции
+> [`supabase/migrations/20260727130000_domain_foundation.sql`](../supabase/migrations/20260727130000_domain_foundation.sql).
+> Остальные сущности этого документа остаются целевой моделью следующих
+> этапов.
+
 
 # 1. Назначение
 
@@ -82,6 +88,9 @@ Profile
 
 User → Profile
 
+В Этапе 1 один пользователь имеет не более одного профиля.
+`profiles.user_id` уникален и ссылается на `auth.users.id`.
+
 
 ---
 
@@ -124,6 +133,15 @@ Constraints
 - доступное время;
 - оборудование;
 - предпочтения.
+
+## Безопасность минимального домена
+
+Для `profiles`, `goals` и `constraints` включён Row Level Security.
+
+Пользователь с ролью `authenticated` может читать, создавать, изменять
+и удалять только строки, где `user_id = auth.uid()`. Роль `anon` не
+получает доступ к этим таблицам. Server Actions всегда получают
+`user_id` из проверенной Auth-сессии, а не из формы пользователя.
 
 
 ---

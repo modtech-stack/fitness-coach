@@ -1,0 +1,2 @@
+-- No user data is committed to the repository.
+-- Create disposable local accounts through Supabase Auth during development.
