@@ -11,6 +11,7 @@ type SignInPageProps = {
   searchParams: Promise<{
     next?: string;
     error?: string;
+    passwordUpdated?: string;
   }>;
 };
 
@@ -33,6 +34,14 @@ export default async function SignInPage({
           role="alert"
         >
           Ссылка подтверждения недействительна или устарела.
+        </p>
+      ) : null}
+      {params.passwordUpdated === "1" ? (
+        <p
+          className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+          role="status"
+        >
+          Пароль обновлён. Войдите с новым паролем.
         </p>
       ) : null}
       <AuthForm

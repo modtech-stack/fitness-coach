@@ -29,6 +29,10 @@ export function getSiteUrl(): string {
   return url.replace(/\/+$/, "");
 }
 
+export function getRecoveryRedirectUrl(): string {
+  return `${getSiteUrl()}/auth/recovery`;
+}
+
 export function getSafeNextPath(
   value: FormDataEntryValue | string | null | undefined,
   fallback = "/dashboard",

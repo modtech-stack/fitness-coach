@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getSafeNextPath, getSiteUrl } from "@/lib/env";
+import {
+  getRecoveryRedirectUrl,
+  getSafeNextPath,
+  getSiteUrl,
+} from "@/lib/env";
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -36,6 +40,16 @@ describe("getSiteUrl", () => {
 
     expect(getSiteUrl()).toBe(
       "https://fitness-preview.vercel.app",
+    );
+  });
+});
+
+describe("getRecoveryRedirectUrl", () => {
+  it("uses a fixed application callback without user input", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fitness.example/");
+
+    expect(getRecoveryRedirectUrl()).toBe(
+      "https://fitness.example/auth/recovery",
     );
   });
 });

@@ -117,16 +117,24 @@ export default async function DashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <section className="surface-card min-w-0">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <h2 className="text-lg font-bold text-slate-950">
                 Профиль
               </h2>
-              <Link
-                className="text-sm font-semibold text-teal-700 hover:text-teal-900"
-                href="/onboarding/profile"
-              >
-                Изменить
-              </Link>
+              <div className="flex flex-wrap justify-end gap-x-4 gap-y-2">
+                <Link
+                  className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+                  href="/onboarding/profile"
+                >
+                  Изменить профиль
+                </Link>
+                <Link
+                  className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+                  href="/settings"
+                >
+                  Управление аккаунтом
+                </Link>
+              </div>
             </div>
             <dl className="mt-5 space-y-3 text-sm">
               {[
