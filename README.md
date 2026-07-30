@@ -1,58 +1,182 @@
 # AI Fitness Trainer
 
-AI Fitness Trainer — система управления персональным тренировочным процессом. Она помогает сформировать проверяемую программу, выполнить запланированную тренировку и адаптировать нагрузку на основе состояния пользователя.
-
-Критические решения принимает прозрачный Training Engine. AI используется для создания черновика программы и объяснения решений, но не заменяет safety-правила и медицинского специалиста.
+AI Fitness Trainer — система управления персональным тренировочным процессом. Она собирает контекст пользователя, а на следующих этапах будет помогать создавать проверяемые программы и адаптировать нагрузку на основе прозрачных правил.
 
 ## Текущий статус
 
-**Phase 0 — Product Architecture / Source of Truth Consolidation.**
+**Stage 1.5 — исправления после первого пользовательского тестирования.**
 
-Приложение ещё не реализовано. Next.js, Supabase и OpenAI API на этом этапе не подключены.
+Реализованы:
 
-## Структура репозитория
+- Next.js 16, TypeScript и Supabase Auth;
+- PostgreSQL-миграции для `profiles`, `goals`, `constraints`;
+- Row Level Security для изоляции данных пользователей;
+- регистрация и первичная настройка профиля;
+- редактирование профиля;
+- создание, изменение и удаление целей и ограничений;
+- одна активная основная цель и любое количество второстепенных;
+- полное удаление собственной учётной записи и связанных данных;
+- unit-тесты и pgTAP-тесты схемы/RLS.
+
+Пока не реализованы построение тренировочных программ, OpenAI API, Training Engine, Polar и расширенная аналитика.
+
+## Технологии
+
+- Next.js App Router;
+- React и TypeScript;
+- Supabase PostgreSQL + Auth + RLS;
+- Tailwind CSS;
+- Zod;
+- Vitest и pgTAP.
+
+Требуется Node.js 20.9 или новее. Для локального Supabase нужен Docker-совместимый runtime.
+
+## Локальный запуск
+
+1. Установите зависимости:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Запустите локальный Supabase:
+
+   ```bash
+   pnpm db:start
+   ```
+
+3. Создайте `.env.local` по образцу `.env.example`.
+
+   URL и ключи локального проекта покажет команда:
+
+   ```bash
+   pnpm exec supabase status -o env
+   ```
+
+   Перенесите URL и публичный ключ в `NEXT_PUBLIC_SUPABASE_URL` и `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Server-only ключ с ролью `service_role` укажите в `SUPABASE_SERVICE_ROLE_KEY`. Не добавляйте `.env.local` в Git.
+
+4. Примените миграции с чистого состояния:
+
+   ```bash
+   pnpm db:reset
+   ```
+
+5. Запустите приложение:
+
+   ```bash
+   pnpm dev
+   ```
+
+   Откройте [http://localhost:3000](http://localhost:3000).
+
+Локальная конфигурация отключает обязательное подтверждение email. В hosted Supabase пользователь сначала подтверждает адрес по ссылке из письма.
+
+## Проверки
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm db:test
+```
+
+`pnpm db:test` требует запущенный локальный Supabase. Тесты проверяют CRUD собственных данных, запрет изменения чужих записей, единственность активной основной цели, каскадное удаление данных и сохранение RLS.
+
+## Публикация через hosted Supabase и Vercel
+
+### 1. Подготовить Supabase
+
+1. Создайте отдельный проект в Supabase и сохраните его Project URL, publishable key и server-only `service_role` key.
+2. Авторизуйте CLI и привяжите репозиторий к проекту:
+
+   ```bash
+   pnpm exec supabase login
+   pnpm exec supabase link --project-ref <project-ref>
+   ```
+
+3. Сначала проверьте список миграций, затем примените их:
+
+   ```bash
+   pnpm exec supabase db push --dry-run
+   pnpm exec supabase db push
+   ```
+
+Не применяйте рабочие миграции вручную через SQL Editor: история схемы должна оставаться воспроизводимой. Подробнее — в [документации Supabase о миграциях](https://supabase.com/docs/guides/deployment/database-migrations).
+
+### 2. Импортировать GitHub-репозиторий в Vercel
+
+1. В Vercel выберите **Add New → Project** и импортируйте `modtech-stack/fitness-coach` из GitHub.
+2. Оставьте Framework Preset `Next.js` и корневой каталог репозитория.
+3. Добавьте переменные окружения:
+
+   | Переменная | Откуда взять | Область |
+   | --- | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL | Production и Preview |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key | Production и Preview |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase `service_role` key | Production и Preview, только server-side |
+   | `NEXT_PUBLIC_SITE_URL` | точный production URL с `https://` | только Production |
+
+Для Preview не задавайте `NEXT_PUBLIC_SITE_URL`: сервер использует системный `VERCEL_URL` текущего deployment. После изменения env-переменных запустите новый deployment. Vercel создаёт Preview для веток/PR и Production для production-ветки; подробнее — в [официальной инструкции Vercel](https://vercel.com/docs/git).
+
+Никогда не добавляйте `service_role` key в переменную с префиксом `NEXT_PUBLIC_`, клиентский код, GitHub, README или логи.
+
+### 3. Настроить Supabase Auth URL Configuration
+
+В Supabase откройте **Authentication → URL Configuration**:
+
+- **Site URL:** точный production URL, например `https://<production-domain>`;
+- **Redirect URLs:**
+  - `https://<production-domain>/auth/confirm`;
+  - `http://localhost:3000/**`;
+  - `https://*-<team-or-account-slug>.vercel.app/**` для Vercel Preview.
+
+Для production используйте точный callback, а wildcard оставляйте только для локальной разработки и Preview. Формат Vercel wildcard приведён в [документации Supabase Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls).
+
+### 4. Проверить опубликованное приложение
+
+1. Откройте production или Preview URL в приватном окне.
+2. Создайте новый тестовый аккаунт с доступным email.
+3. Убедитесь, что письмо подтверждения ведёт на `/auth/confirm`, после чего открывается первичная настройка.
+4. Заполните профиль, цель и ограничения; выйдите и войдите снова.
+5. Проверьте редактирование/удаление записей и полное удаление отдельного тестового аккаунта.
+6. После удаления убедитесь, что прежние данные отсутствуют и повторный вход не выполняется.
+
+## Структура
 
 ```text
 .
-├── README.md
-├── docs/
-│   ├── 00_project_rules.md
-│   ├── 01_product_vision.md
-│   ├── 02_core_model.md
-│   ├── 03_mvp_specification.md
-│   ├── 04_database_schema.md
-│   ├── 05_training_engine.md
-│   ├── 06_codex_instructions.md
-│   ├── 07_program_builder.md
-│   ├── 08_implementation_plan.md
-│   └── DECISIONS.md
-├── knowledge/
-│   └── training/
-│       └── training_engine_principles_v0.9.md
-└── profiles/
-    └── examples/
-        ├── boris.example.md
-        └── alena.example.md
+├── src/
+│   ├── app/                  # страницы и маршруты App Router
+│   ├── features/
+│   │   ├── account/          # полное удаление аккаунта
+│   │   ├── auth/             # регистрация и вход
+│   │   ├── home/             # состояния публичной главной
+│   │   └── onboarding/       # профиль, цели, ограничения
+│   ├── lib/
+│   │   ├── auth/
+│   │   └── supabase/         # browser/server/admin/proxy clients
+│   ├── types/
+│   └── proxy.ts              # обновление Auth-сессии
+├── supabase/
+│   ├── migrations/           # версионируемая схема PostgreSQL
+│   ├── tests/database/       # pgTAP и RLS
+│   ├── config.toml
+│   └── seed.sql
+├── docs/                     # продуктовые и архитектурные документы
+├── knowledge/                # принципы Training Engine
+└── profiles/examples/        # только синтетические профили
 ```
 
-## Порядок чтения
+## Порядок чтения документации
 
 1. [Project Rules](docs/00_project_rules.md)
 2. [Product Vision](docs/01_product_vision.md)
 3. [Core Model](docs/02_core_model.md)
 4. [MVP Specification](docs/03_mvp_specification.md)
 5. [Architecture Decisions](docs/DECISIONS.md)
-6. [Training Engine Principles](knowledge/training/training_engine_principles_v0.9.md)
-7. [GPT Program Builder](docs/07_program_builder.md)
-8. [Database Schema](docs/04_database_schema.md)
-9. [Training Engine Specification status](docs/05_training_engine.md)
-10. [Implementation Plan](docs/08_implementation_plan.md)
-11. [Codex Development Instructions](docs/06_codex_instructions.md)
+6. [Database Schema](docs/04_database_schema.md)
+7. [Implementation Plan](docs/08_implementation_plan.md)
+8. [Training Engine Principles](knowledge/training/training_engine_principles_v0.9.md)
 
-## Источник истины
-
-Ветка `main` является единственным источником актуальной документации. Тематические ветки могут использоваться только временно для подготовки изменений через Pull Request.
-
-## Конфиденциальность
-
-Реальные пользовательские, медицинские и биометрические данные не хранятся в репозитории. Файлы в [`profiles/examples/`](profiles/examples/) являются синтетическими примерами.
+Ветка `main` является единственным источником актуальной документации. Реальные медицинские, биометрические, контактные и другие конфиденциальные данные в репозитории не хранятся.
