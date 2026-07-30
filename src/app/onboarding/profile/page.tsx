@@ -21,10 +21,14 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-6">
-      <OnboardingStepper currentStep={1} />
+      {!profile?.onboarding_completed_at ? (
+        <OnboardingStepper currentStep={1} />
+      ) : null}
       <section className="surface-card">
         <p className="text-sm font-semibold text-teal-700">
-          Шаг 1 из 3
+          {profile?.onboarding_completed_at
+            ? "Редактирование профиля"
+            : "Шаг 1 из 3"}
         </p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-950">
           Основной профиль

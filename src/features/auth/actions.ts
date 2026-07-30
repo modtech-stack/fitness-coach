@@ -17,9 +17,9 @@ function getAuthErrorMessage(code?: string): string {
   switch (code) {
     case "email_exists":
     case "user_already_exists":
-      return "Аккаунт с таким email уже существует.";
+      return "Аккаунт с таким адресом уже существует.";
     case "invalid_credentials":
-      return "Неверный email или пароль.";
+      return "Неверная электронная почта или пароль.";
     case "weak_password":
       return "Пароль не соответствует требованиям безопасности.";
     default:
@@ -62,7 +62,7 @@ export async function signUpAction(
     return {
       status: "success",
       message:
-        "Аккаунт создан. Подтвердите email по ссылке из письма, затем войдите.",
+        "Аккаунт создан. Подтвердите адрес по ссылке из письма, затем войдите.",
     };
   }
 

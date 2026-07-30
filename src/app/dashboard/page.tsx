@@ -4,14 +4,19 @@ import { redirect } from "next/navigation";
 
 import { signOutAction } from "@/features/auth/actions";
 import {
+  deleteConstraintAction,
+  deleteGoalAction,
+} from "@/features/onboarding/actions";
+import {
   activityOptions,
   constraintTypeOptions,
   experienceOptions,
+  goalPriorityOptions,
   goalStatusOptions,
   goalTypeOptions,
-  severityOptions,
   sexOptions,
 } from "@/features/onboarding/schemas";
+import { DestructiveActionForm } from "@/features/shared/destructive-action-form";
 import { requireUser } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = {
@@ -20,9 +25,9 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-function toLabel(
-  options: ReadonlyArray<{ value: string; label: string }>,
-  value: string,
+function toLabel<T extends string | number>(
+  options: ReadonlyArray<{ value: T; label: string }>,
+  value: T,
 ) {
   return options.find((option) => option.value === value)?.label ?? value;
 }
@@ -77,33 +82,41 @@ export default async function DashboardPage() {
           >
             AI Fitness Trainer
           </Link>
-          <form action={signOutAction}>
-            <button
+          <div className="flex items-center gap-4">
+            <Link
               className="text-sm font-semibold text-slate-600 hover:text-slate-950"
-              type="submit"
+              href="/settings"
             >
-              Выйти
-            </button>
-          </form>
+              Настройки
+            </Link>
+            <form action={signOutAction}>
+              <button
+                className="text-sm font-semibold text-slate-600 hover:text-slate-950"
+                type="submit"
+              >
+                Выйти
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-6xl px-5 py-10">
         <div className="mb-8">
           <p className="text-sm font-semibold text-teal-700">
-            Domain Foundation
+            Основные данные
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+          <h1 className="mt-2 break-words text-3xl font-bold tracking-tight text-slate-950">
             Здравствуйте, {profile.name}
           </h1>
           <p className="mt-2 text-slate-600">
-            Onboarding завершён. Сейчас вы можете проверять и дополнять
-            базовый контекст.
+            Первичная настройка завершена. Здесь можно проверять и
+            дополнять базовые данные.
           </p>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          <section className="surface-card">
+          <section className="surface-card min-w-0">
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-lg font-bold text-slate-950">
                 Профиль
@@ -117,20 +130,20 @@ export default async function DashboardPage() {
             </div>
             <dl className="mt-5 space-y-3 text-sm">
               {[
-                ["Email", user.email ?? "—"],
+                ["Электронная почта", user.email ?? "—"],
                 ["Дата рождения", profile.birth_date],
                 ["Пол", toLabel(sexOptions, profile.sex)],
                 ["Рост", `${profile.height_cm} см`],
                 ["Вес", `${profile.weight_kg} кг`],
                 [
-                  "Опыт",
+                  "Опыт регулярных тренировок",
                   toLabel(
                     experienceOptions,
                     profile.training_experience,
                   ),
                 ],
                 [
-                  "Активность",
+                  "Активность вне тренировок",
                   toLabel(activityOptions, profile.activity_level),
                 ],
               ].map(([term, value]) => (
@@ -138,8 +151,8 @@ export default async function DashboardPage() {
                   className="flex justify-between gap-4 border-b border-slate-100 pb-3 last:border-0"
                   key={term}
                 >
-                  <dt className="text-slate-500">{term}</dt>
-                  <dd className="text-right font-medium text-slate-900">
+                  <dt className="min-w-0 text-slate-500">{term}</dt>
+                  <dd className="min-w-0 break-words text-right font-medium text-slate-900 [overflow-wrap:anywhere]">
                     {value}
                   </dd>
                 </div>
@@ -147,7 +160,7 @@ export default async function DashboardPage() {
             </dl>
           </section>
 
-          <section className="surface-card">
+          <section className="surface-card min-w-0">
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-lg font-bold text-slate-950">
                 Цели
@@ -170,7 +183,10 @@ export default async function DashboardPage() {
                       {toLabel(goalTypeOptions, goal.goal_type)}
                     </p>
                     <span className="rounded-full bg-teal-50 px-2 py-1 text-xs font-bold text-teal-800">
-                      P{goal.priority}
+                      {toLabel(
+                        goalPriorityOptions,
+                        goal.priority as 1 | 2,
+                      )}
                     </span>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -179,12 +195,26 @@ export default async function DashboardPage() {
                   <p className="mt-3 text-xs font-semibold text-slate-500">
                     {toLabel(goalStatusOptions, goal.status)}
                   </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3">
+                    <Link
+                      className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+                      href={`/onboarding/goal?edit=${goal.id}`}
+                    >
+                      Изменить
+                    </Link>
+                    <DestructiveActionForm
+                      action={deleteGoalAction}
+                      confirmMessage="Удалить эту цель? Это действие нельзя отменить."
+                      id={goal.id}
+                      label="Удалить"
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
           </section>
 
-          <section className="surface-card">
+          <section className="surface-card min-w-0">
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-lg font-bold text-slate-950">
                 Ограничения
@@ -203,39 +233,44 @@ export default async function DashboardPage() {
                     className="rounded-xl border border-slate-200 p-4"
                     key={constraint.id}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="font-semibold text-slate-950">
-                        {toLabel(
-                          constraintTypeOptions,
-                          constraint.type,
-                        )}
-                      </p>
-                      <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-bold text-amber-800">
-                        {toLabel(
-                          severityOptions,
-                          constraint.severity,
-                        )}
-                      </span>
-                    </div>
+                    <p className="font-semibold text-slate-950">
+                      {toLabel(
+                        constraintTypeOptions,
+                        constraint.type,
+                      )}
+                    </p>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       {constraint.description}
                     </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3">
+                      <Link
+                        className="text-sm font-semibold text-teal-700 hover:text-teal-900"
+                        href={`/onboarding/constraints?edit=${constraint.id}`}
+                      >
+                        Изменить
+                      </Link>
+                      <DestructiveActionForm
+                        action={deleteConstraintAction}
+                        confirmMessage="Удалить это ограничение? Это действие нельзя отменить."
+                        id={constraint.id}
+                        label="Удалить"
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>
             ) : (
               <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-                Вы указали, что ограничений нет.
+                Ограничения не добавлены.
               </p>
             )}
           </section>
         </div>
 
         <aside className="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-sm leading-6 text-slate-600">
-          Следующий этап продукта добавит заранее подготовленную
-          тренировочную программу и журнал выполнения. GPT Program
-          Builder, Training Engine и wearable-интеграции пока не
-          подключены.
+          На следующем этапе появятся заранее подготовленная
+          тренировочная программа и журнал выполнения. Автоматическое
+          построение и изменение программ пока не подключены.
         </aside>
       </div>
     </main>

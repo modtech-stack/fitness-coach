@@ -121,46 +121,75 @@ export function ProfileForm({
         </div>
       </div>
 
-      <div>
-        <label
-          className="field-label"
-          htmlFor="training_experience"
-        >
-          Опыт тренировок
-        </label>
-        <select
-          className="field-input"
-          defaultValue={profile?.training_experience ?? "beginner"}
-          id="training_experience"
-          name="training_experience"
-        >
+      <fieldset>
+        <legend className="field-label">
+          Опыт регулярных тренировок
+        </legend>
+        <p className="mb-3 text-sm leading-6 text-slate-600">
+          Укажите, как долго вы регулярно занимались силовыми или
+          аэробными тренировками. Это поможет подобрать безопасный
+          объём и сложность программы.
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2">
           {experienceOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
+            <label
+              className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm text-slate-800 has-checked:border-teal-600 has-checked:bg-teal-50"
+              key={option.value}
+            >
+              <input
+                className="size-4 accent-teal-700"
+                defaultChecked={
+                  (profile?.training_experience ?? "none") ===
+                  option.value
+                }
+                name="training_experience"
+                type="radio"
+                value={option.value}
+              />
+              <span className="font-medium">{option.label}</span>
+            </label>
           ))}
-        </select>
+        </div>
         <FieldError errors={state.errors?.training_experience} />
-      </div>
+      </fieldset>
 
-      <div>
-        <label className="field-label" htmlFor="activity_level">
-          Повседневная активность
-        </label>
-        <select
-          className="field-input"
-          defaultValue={profile?.activity_level ?? "moderate"}
-          id="activity_level"
-          name="activity_level"
-        >
+      <fieldset>
+        <legend className="field-label">
+          Повседневная активность вне тренировок
+        </legend>
+        <p className="mb-3 text-sm leading-6 text-slate-600">
+          Учитывайте работу, ходьбу, домашние дела и другую обычную
+          активность. Не включайте сюда запланированные тренировки.
+        </p>
+        <div className="space-y-2">
           {activityOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
+            <label
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 has-checked:border-teal-600 has-checked:bg-teal-50"
+              key={option.value}
+            >
+              <input
+                className="mt-1 size-4 shrink-0 accent-teal-700"
+                defaultChecked={
+                  (profile?.activity_level ?? "moderate") ===
+                  option.value
+                }
+                name="activity_level"
+                type="radio"
+                value={option.value}
+              />
+              <span>
+                <span className="block font-semibold text-slate-900">
+                  {option.label}
+                </span>
+                <span className="mt-1 block text-sm leading-6 text-slate-600">
+                  {option.description}
+                </span>
+              </span>
+            </label>
           ))}
-        </select>
+        </div>
         <FieldError errors={state.errors?.activity_level} />
-      </div>
+      </fieldset>
 
       <FormMessage state={state} />
 

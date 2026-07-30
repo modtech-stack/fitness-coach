@@ -18,7 +18,15 @@ export function getSupabaseConfig(): SupabaseConfig {
 }
 
 export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.VERCEL_URL ||
+    "http://localhost:3000";
+  const url = configuredUrl.startsWith("http")
+    ? configuredUrl
+    : `https://${configuredUrl}`;
+
+  return url.replace(/\/+$/, "");
 }
 
 export function getSafeNextPath(

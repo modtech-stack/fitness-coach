@@ -13,15 +13,12 @@ export type ProfileSex =
   | "prefer_not_to_say";
 
 export type TrainingExperience =
-  | "beginner"
-  | "intermediate"
-  | "advanced";
+  | "none"
+  | "under_6_months"
+  | "six_months_to_two_years"
+  | "over_two_years";
 
-export type ActivityLevel =
-  | "sedentary"
-  | "light"
-  | "moderate"
-  | "very_active";
+export type ActivityLevel = "low" | "moderate" | "high";
 
 export type GoalType =
   | "weight_loss"
@@ -33,11 +30,11 @@ export type GoalType =
 export type GoalStatus = "active" | "paused" | "completed";
 
 export type ConstraintType =
-  | "health"
+  | "pain"
   | "injury"
+  | "health"
   | "schedule"
   | "equipment"
-  | "preference"
   | "other";
 
 export type ConstraintSeverity = "low" | "medium" | "high";
@@ -129,7 +126,7 @@ export type Database = {
           user_id: string;
           type: ConstraintType;
           description: string;
-          severity: ConstraintSeverity;
+          severity: ConstraintSeverity | null;
           created_at: string;
           updated_at: string;
         };
@@ -138,7 +135,7 @@ export type Database = {
           user_id: string;
           type: ConstraintType;
           description: string;
-          severity: ConstraintSeverity;
+          severity?: ConstraintSeverity | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -147,7 +144,7 @@ export type Database = {
           user_id?: string;
           type?: ConstraintType;
           description?: string;
-          severity?: ConstraintSeverity;
+          severity?: ConstraintSeverity | null;
           created_at?: string;
           updated_at?: string;
         };

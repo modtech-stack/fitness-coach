@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import type {
   ActivityLevel,
-  ConstraintSeverity,
   ConstraintType,
   GoalStatus,
   GoalType,
@@ -47,16 +46,12 @@ export const profileSchema = z.object({
     .min(30, "Вес должен быть не меньше 30 кг.")
     .max(400, "Вес должен быть не больше 400 кг."),
   training_experience: z.enum([
-    "beginner",
-    "intermediate",
-    "advanced",
+    "none",
+    "under_6_months",
+    "six_months_to_two_years",
+    "over_two_years",
   ]),
-  activity_level: z.enum([
-    "sedentary",
-    "light",
-    "moderate",
-    "very_active",
-  ]),
+  activity_level: z.enum(["low", "moderate", "high"]),
 });
 
 export const goalSchema = z.object({
@@ -75,18 +70,20 @@ export const goalSchema = z.object({
   priority: z.coerce
     .number()
     .int()
-    .min(1, "Приоритет должен быть от 1 до 5.")
-    .max(5, "Приоритет должен быть от 1 до 5."),
+    .refine(
+      (value) => value === 1 || value === 2,
+      "Выберите основную или второстепенную цель.",
+    ),
   status: z.enum(["active", "paused", "completed"]),
 });
 
 export const constraintSchema = z.object({
   type: z.enum([
-    "health",
+    "pain",
     "injury",
+    "health",
     "schedule",
     "equipment",
-    "preference",
     "other",
   ]),
   description: z
@@ -94,8 +91,11 @@ export const constraintSchema = z.object({
     .trim()
     .min(3, "Опишите ограничение хотя бы тремя символами.")
     .max(500, "Описание не должно быть длиннее 500 символов."),
-  severity: z.enum(["low", "medium", "high"]),
 });
+
+export const entityIdSchema = z
+  .string()
+  .uuid("Запись не найдена. Обновите страницу и попробуйте ещё раз.");
 
 export const sexOptions: ReadonlyArray<{
   value: ProfileSex;
@@ -111,19 +111,38 @@ export const experienceOptions: ReadonlyArray<{
   value: TrainingExperience;
   label: string;
 }> = [
-  { value: "beginner", label: "Начальный" },
-  { value: "intermediate", label: "Средний" },
-  { value: "advanced", label: "Продвинутый" },
+  { value: "none", label: "Нет регулярного опыта" },
+  { value: "under_6_months", label: "Менее 6 месяцев" },
+  {
+    value: "six_months_to_two_years",
+    label: "От 6 месяцев до 2 лет",
+  },
+  { value: "over_two_years", label: "Более 2 лет" },
 ];
 
 export const activityOptions: ReadonlyArray<{
   value: ActivityLevel;
   label: string;
+  description: string;
 }> = [
-  { value: "sedentary", label: "Низкая" },
-  { value: "light", label: "Лёгкая" },
-  { value: "moderate", label: "Умеренная" },
-  { value: "very_active", label: "Высокая" },
+  {
+    value: "low",
+    label: "Низкая",
+    description:
+      "В основном сидячая работа, мало ходьбы и бытовой активности. Например, офисная работа и обычно менее 5 000 шагов в день.",
+  },
+  {
+    value: "moderate",
+    label: "Умеренная",
+    description:
+      "В течение дня есть ходьба или работа на ногах, но без тяжёлого физического труда. Например, примерно 5 000–10 000 шагов в день.",
+  },
+  {
+    value: "high",
+    label: "Высокая",
+    description:
+      "Физическая работа или высокая ежедневная подвижность. Например, работа пожарным, строителем, курьером или обычно более 10 000 шагов в день.",
+  },
 ];
 
 export const goalTypeOptions: ReadonlyArray<{
@@ -146,23 +165,49 @@ export const goalStatusOptions: ReadonlyArray<{
   { value: "completed", label: "Завершена" },
 ];
 
+export const goalPriorityOptions = [
+  { value: 1, label: "Основная" },
+  { value: 2, label: "Второстепенная" },
+] as const;
+
 export const constraintTypeOptions: ReadonlyArray<{
   value: ConstraintType;
   label: string;
+  examples: string;
 }> = [
-  { value: "health", label: "Самочувствие или здоровье" },
-  { value: "injury", label: "Травма или движение" },
-  { value: "schedule", label: "Расписание" },
-  { value: "equipment", label: "Оборудование" },
-  { value: "preference", label: "Предпочтение" },
-  { value: "other", label: "Другое" },
-];
-
-export const severityOptions: ReadonlyArray<{
-  value: ConstraintSeverity;
-  label: string;
-}> = [
-  { value: "low", label: "Низкая" },
-  { value: "medium", label: "Средняя" },
-  { value: "high", label: "Высокая" },
+  {
+    value: "pain",
+    label: "Боль или дискомфорт",
+    examples:
+      "Например: болит колено при приседаниях, беспокоит поясница после нагрузки или появляется боль в плече при жиме.",
+  },
+  {
+    value: "injury",
+    label: "Травма или восстановление после травмы",
+    examples:
+      "Например: растяжение, повреждение сустава или восстановление после операции.",
+  },
+  {
+    value: "health",
+    label: "Ограничение здоровья",
+    examples:
+      "Например: заболевание сердца, повышенное давление, астма или ограничение врача. Приложение не ставит диагнозов.",
+  },
+  {
+    value: "schedule",
+    label: "Ограничение по времени",
+    examples:
+      "Например: могу тренироваться не более 40 минут или доступны только три дня в неделю.",
+  },
+  {
+    value: "equipment",
+    label: "Оборудование",
+    examples:
+      "Например: тренируюсь дома, нет штанги или доступны только гантели.",
+  },
+  {
+    value: "other",
+    label: "Другое",
+    examples: "Опишите своими словами всё, что не подошло к другим типам.",
+  },
 ];

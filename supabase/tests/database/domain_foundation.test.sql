@@ -88,7 +88,7 @@ select lives_ok(
       'prefer_not_to_say',
       175,
       75,
-      'beginner',
+      'under_6_months',
       'moderate'
     )
   $$,
@@ -158,8 +158,8 @@ select lives_ok(
       'prefer_not_to_say',
       165,
       65,
-      'intermediate',
-      'light'
+      'six_months_to_two_years',
+      'moderate'
     )
   $$,
   'user B can save a profile'

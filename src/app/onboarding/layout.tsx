@@ -18,7 +18,7 @@ export default async function OnboardingLayout({
         <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-4">
           <Link
             className="text-sm font-bold tracking-[0.14em] text-teal-800 uppercase"
-            href="/dashboard"
+            href="/"
           >
             AI Fitness Trainer
           </Link>

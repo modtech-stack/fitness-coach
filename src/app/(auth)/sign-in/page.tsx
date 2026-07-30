@@ -25,7 +25,7 @@ export default async function SignInPage({
         Войти
       </h1>
       <p className="mt-2 mb-7 text-sm leading-6 text-slate-600">
-        Продолжите onboarding или откройте сохранённый профиль.
+        Продолжите первичную настройку или откройте сохранённый профиль.
       </p>
       {params.error ? (
         <p

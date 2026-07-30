@@ -4,7 +4,7 @@ export const credentialsSchema = z.object({
   email: z
     .string()
     .trim()
-    .email("Введите корректный email."),
+    .email("Введите корректный адрес электронной почты."),
   password: z
     .string()
     .min(8, "Пароль должен содержать минимум 8 символов.")

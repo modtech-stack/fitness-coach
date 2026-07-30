@@ -35,7 +35,7 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
 
       <div>
         <label className="field-label" htmlFor="email">
-          Email
+          Электронная почта
         </label>
         <input
           autoComplete="email"

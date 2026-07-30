@@ -6,7 +6,7 @@ import {
   profileSchema,
 } from "@/features/onboarding/schemas";
 
-describe("onboarding schemas", () => {
+describe("primary setup schemas", () => {
   it("accepts a complete profile", () => {
     const result = profileSchema.safeParse({
       name: "Test User",
@@ -14,7 +14,7 @@ describe("onboarding schemas", () => {
       sex: "prefer_not_to_say",
       height_cm: "175",
       weight_kg: "75.5",
-      training_experience: "beginner",
+      training_experience: "under_6_months",
       activity_level: "moderate",
     });
 
@@ -32,7 +32,7 @@ describe("onboarding schemas", () => {
       sex: "prefer_not_to_say",
       height_cm: "25",
       weight_kg: "10",
-      training_experience: "beginner",
+      training_experience: "none",
       activity_level: "moderate",
     });
 
@@ -50,11 +50,24 @@ describe("onboarding schemas", () => {
     expect(result.success).toBe(true);
   });
 
-  it("accepts a bounded constraint", () => {
+  it.each(["3", "4", "5"])(
+    "rejects legacy goal priority %s",
+    (priority) => {
+      const result = goalSchema.safeParse({
+        goal_type: "general_fitness",
+        description: "Train consistently three times per week",
+        priority,
+        status: "active",
+      });
+
+      expect(result.success).toBe(false);
+    },
+  );
+
+  it("accepts a constraint without a severity selected by the user", () => {
     const result = constraintSchema.safeParse({
       type: "schedule",
       description: "Weekday sessions are limited to one hour",
-      severity: "medium",
     });
 
     expect(result.success).toBe(true);

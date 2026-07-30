@@ -7,7 +7,7 @@ export function OnboardingStepper({
 }) {
   return (
     <ol
-      aria-label="Этапы onboarding"
+      aria-label="Этапы первичной настройки"
       className="grid grid-cols-3 gap-2"
     >
       {steps.map((step, index) => {

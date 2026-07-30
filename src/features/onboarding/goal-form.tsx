@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { saveGoalAction } from "@/features/onboarding/actions";
 import {
+  goalPriorityOptions,
   goalStatusOptions,
   goalTypeOptions,
 } from "@/features/onboarding/schemas";
@@ -12,8 +13,15 @@ import {
   FormMessage,
 } from "@/features/shared/form-feedback";
 import { initialFormState } from "@/features/shared/form-state";
+import type { Goal } from "@/types/database";
 
-export function GoalForm({ nextPath }: { nextPath: string }) {
+export function GoalForm({
+  goal,
+  nextPath,
+}: {
+  goal: Goal | null;
+  nextPath: string;
+}) {
   const [state, formAction, pending] = useActionState(
     saveGoalAction,
     initialFormState,
@@ -22,6 +30,7 @@ export function GoalForm({ nextPath }: { nextPath: string }) {
   return (
     <form action={formAction} className="space-y-5">
       <input type="hidden" name="next" value={nextPath} />
+      {goal ? <input type="hidden" name="id" value={goal.id} /> : null}
 
       <div>
         <label className="field-label" htmlFor="goal_type">
@@ -29,7 +38,7 @@ export function GoalForm({ nextPath }: { nextPath: string }) {
         </label>
         <select
           className="field-input"
-          defaultValue="general_fitness"
+          defaultValue={goal?.goal_type ?? "general_fitness"}
           id="goal_type"
           name="goal_type"
         >
@@ -53,6 +62,7 @@ export function GoalForm({ nextPath }: { nextPath: string }) {
           name="description"
           placeholder="Например: тренироваться регулярно три раза в неделю"
           required
+          defaultValue={goal?.description ?? ""}
         />
         <FieldError errors={state.errors?.description} />
       </div>
@@ -64,15 +74,15 @@ export function GoalForm({ nextPath }: { nextPath: string }) {
           </label>
           <select
             className="field-input"
-            defaultValue="1"
+            defaultValue={goal?.priority ?? 1}
             id="priority"
             name="priority"
           >
-            <option value="1">1 — главный</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5 — дополнительный</option>
+            {goalPriorityOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
           <FieldError errors={state.errors?.priority} />
         </div>
@@ -83,7 +93,7 @@ export function GoalForm({ nextPath }: { nextPath: string }) {
           </label>
           <select
             className="field-input"
-            defaultValue="active"
+            defaultValue={goal?.status ?? "active"}
             id="status"
             name="status"
           >
@@ -104,7 +114,11 @@ export function GoalForm({ nextPath }: { nextPath: string }) {
         disabled={pending}
         type="submit"
       >
-        {pending ? "Сохраняем…" : "Сохранить цель"}
+        {pending
+          ? "Сохраняем…"
+          : goal
+            ? "Сохранить изменения"
+            : "Создать цель"}
       </button>
     </form>
   );
