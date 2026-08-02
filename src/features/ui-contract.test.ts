@@ -43,4 +43,35 @@ describe("user interface contract", () => {
       );
     }
   });
+
+  it("links password recovery from the sign-in form", () => {
+    const source = readSource(
+      "src/features/auth/auth-form.tsx",
+    );
+
+    expect(source).toContain("Забыли пароль?");
+    expect(source).toContain('href="/forgot-password"');
+  });
+
+  it("links account management from the profile card", () => {
+    const source = readSource("src/app/dashboard/page.tsx");
+
+    expect(source).toContain("Управление аккаунтом");
+    expect(source).toContain('href="/settings"');
+  });
+
+  it("keeps the service-role key out of client modules", () => {
+    const clientModules = [
+      "src/features/auth/auth-form.tsx",
+      "src/features/auth/new-password-form.tsx",
+      "src/features/auth/password-reset-request-form.tsx",
+      "src/features/account/account-deletion-form.tsx",
+    ];
+
+    for (const source of clientModules) {
+      expect(readSource(source)).not.toContain(
+        "SUPABASE_SERVICE_ROLE_KEY",
+      );
+    }
+  });
 });

@@ -72,6 +72,17 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
 
       <FormMessage state={state} />
 
+      {isSignIn ? (
+        <p className="text-right text-sm">
+          <Link
+            className="font-semibold text-teal-700 hover:text-teal-900"
+            href="/forgot-password"
+          >
+            Забыли пароль?
+          </Link>
+        </p>
+      ) : null}
+
       <button
         className="primary-button w-full"
         disabled={pending}
