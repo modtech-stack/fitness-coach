@@ -75,6 +75,10 @@ describe("user interface contract", () => {
       "src/features/auth/new-password-form.tsx",
       "src/features/auth/password-reset-request-form.tsx",
       "src/features/account/account-deletion-form.tsx",
+      "src/features/shared/feedback-widget.tsx",
+      "src/features/training/program-edit-form.tsx",
+      "src/features/training/planned-workout-edit-form.tsx",
+      "src/features/training/workout-completion-form.tsx",
     ];
 
     for (const source of clientModules) {

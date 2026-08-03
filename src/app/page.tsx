@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { getHomeActions } from "@/features/home/get-home-actions";
 import { createClient } from "@/lib/supabase/server";
@@ -16,35 +17,15 @@ export default async function Home({ searchParams }: HomePageProps) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let hasProfile = false;
-  let hasGoals = false;
-  let isSetupComplete = false;
-
   if (user) {
-    const [{ data: profile }, { count: goalsCount }] =
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .select("onboarding_completed_at")
-          .eq("user_id", user.id)
-          .maybeSingle(),
-        supabase
-          .from("goals")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-      ]);
-
-    hasProfile = Boolean(profile);
-    hasGoals = Boolean(goalsCount);
-    isSetupComplete =
-      Boolean(profile?.onboarding_completed_at) && hasGoals;
+    redirect("/dashboard");
   }
 
   const actions = getHomeActions({
-    isAuthenticated: Boolean(user),
-    hasProfile,
-    hasGoals,
-    isSetupComplete,
+    isAuthenticated: false,
+    hasProfile: false,
+    hasGoals: false,
+    isSetupComplete: false,
   });
 
   return (

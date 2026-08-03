@@ -33,7 +33,7 @@ export default async function TodayPage() {
         </h1>
 
         {!program ? (
-          <section className="surface-card mt-8">
+          <section className="surface-card mt-8 min-w-0">
             <h2 className="text-xl font-bold text-slate-950">
               Сначала добавьте программу
             </h2>
@@ -60,7 +60,7 @@ export default async function TodayPage() {
           <section className="surface-card mt-8">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-slate-950">
+                <h2 className="break-words text-2xl font-bold text-slate-950 [overflow-wrap:anywhere]">
                   {workout.name}
                 </h2>
                 <p className="mt-2 text-slate-600">{workout.focus}</p>
@@ -74,12 +74,21 @@ export default async function TodayPage() {
             </p>
             <ul className="mt-6 divide-y divide-slate-100 rounded-xl border border-slate-200">
               {workout.exercises.map((exercise) => (
-                <li className="flex justify-between gap-4 p-4" key={exercise.id}>
-                  <span className="font-semibold text-slate-900">
+                <li
+                  className="grid min-w-0 gap-2 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-4"
+                  key={exercise.id}
+                >
+                  <span className="break-words font-semibold text-slate-900 [overflow-wrap:anywhere]">
                     {exercise.exercise_order}. {exercise.name}
                   </span>
-                  <span className="text-right text-sm text-slate-500">
+                  <span className="text-sm text-slate-500 sm:text-right">
                     {exercise.planned_sets} × {exercise.planned_reps}
+                    {exercise.target_weight_kg !== null
+                      ? ` · Рабочий вес: ${exercise.target_weight_kg} кг`
+                      : " · Рабочий вес не указан"}
+                    {exercise.target_rpe !== null
+                      ? ` · RPE ${exercise.target_rpe}`
+                      : ""}
                   </span>
                 </li>
               ))}
@@ -94,12 +103,20 @@ export default async function TodayPage() {
                 </Link>
               </div>
             ) : (
-              <Link
-                className="primary-button mt-6"
-                href={`/workouts/${workout.id}`}
-              >
-                Открыть тренировку
-              </Link>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  className="primary-button"
+                  href={`/workouts/${workout.id}`}
+                >
+                  Начать тренировку
+                </Link>
+                <Link
+                  className="secondary-button"
+                  href={`/workouts/${workout.id}/edit`}
+                >
+                  Изменить тренировку
+                </Link>
+              </div>
             )}
           </section>
         )}

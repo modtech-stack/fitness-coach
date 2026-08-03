@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { signOutAction } from "@/features/auth/actions";
+import { FeedbackWidget } from "@/features/shared/feedback-widget";
 import { requireUser } from "@/lib/auth/require-user";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +39,7 @@ export default async function OnboardingLayout({
         </div>
       </header>
       <div className="mx-auto max-w-3xl px-5 py-10">{children}</div>
+      <FeedbackWidget />
     </main>
   );
 }

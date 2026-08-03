@@ -17,6 +17,8 @@ import {
 } from "@/features/onboarding/schemas";
 import { DestructiveActionForm } from "@/features/shared/destructive-action-form";
 import { AppHeader } from "@/features/shared/app-header";
+import { getTodayDate } from "@/features/training/date";
+import { getActiveProgramHierarchy } from "@/features/training/queries";
 import { requireUser } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = {
@@ -72,6 +74,45 @@ export default async function DashboardPage() {
     redirect("/onboarding/constraints");
   }
 
+  const program = await getActiveProgramHierarchy(supabase, user.id);
+  const todayWorkout = program?.phases
+    .flatMap((phase) => phase.weeks)
+    .flatMap((week) => week.workouts)
+    .find((workout) => workout.scheduled_date === getTodayDate());
+
+  const nextStep = !program
+    ? {
+        eyebrow: "Следующий шаг",
+        title: "Создайте тренировочную программу",
+        description:
+          "Добавьте подготовленную программу, чтобы начать первый тренировочный цикл.",
+        href: "/program",
+        label: "Создать программу",
+      }
+    : todayWorkout && !todayWorkout.session
+      ? {
+          eyebrow: "Следующий шаг",
+          title: "Сегодня запланирована тренировка",
+          description: `${todayWorkout.name}: ${todayWorkout.focus}`,
+          href: `/workouts/${todayWorkout.id}`,
+          label: "Начать тренировку",
+        }
+      : todayWorkout?.session
+        ? {
+            eyebrow: "Сегодня",
+            title: "Тренировка выполнена",
+            description: "Результат сохранён и доступен в истории тренировок.",
+            href: "/history",
+            label: "Посмотреть результат",
+          }
+        : {
+            eyebrow: "Следующий шаг",
+            title: "На сегодня тренировки нет",
+            description: "Откройте программу, чтобы посмотреть ближайший план.",
+            href: "/program",
+            label: "Перейти к программе",
+          };
+
   return (
     <main className="min-h-screen bg-slate-100">
       <AppHeader />
@@ -89,6 +130,21 @@ export default async function DashboardPage() {
             дополнять базовые данные.
           </p>
         </div>
+
+        <section className="mb-8 rounded-2xl border border-teal-200 bg-teal-50 p-6 shadow-sm sm:p-8">
+          <p className="text-sm font-semibold text-teal-700">
+            {nextStep.eyebrow}
+          </p>
+          <h2 className="mt-2 text-2xl font-bold text-slate-950">
+            {nextStep.title}
+          </h2>
+          <p className="mt-3 max-w-2xl leading-7 text-slate-600">
+            {nextStep.description}
+          </p>
+          <Link className="primary-button mt-6" href={nextStep.href}>
+            {nextStep.label}
+          </Link>
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <section className="surface-card min-w-0">

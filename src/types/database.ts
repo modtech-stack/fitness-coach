@@ -275,6 +275,7 @@ export type Database = {
           estimated_minutes: number;
           workout_order: number;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -287,6 +288,7 @@ export type Database = {
           estimated_minutes: number;
           workout_order: number;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -299,6 +301,7 @@ export type Database = {
           estimated_minutes?: number;
           workout_order?: number;
           created_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -315,6 +318,7 @@ export type Database = {
           notes: string | null;
           exercise_order: number;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -328,6 +332,7 @@ export type Database = {
           notes?: string | null;
           exercise_order: number;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -341,6 +346,7 @@ export type Database = {
           notes?: string | null;
           exercise_order?: number;
           created_at?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -419,6 +425,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_feedback: {
+        Row: {
+          id: string;
+          user_id: string;
+          page_url: string;
+          message: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          page_url: string;
+          message: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          page_url?: string;
+          message?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -433,6 +463,30 @@ export type Database = {
           p_planned_workout_id: string;
           p_comment: string | null;
           p_sets: Json;
+        };
+        Returns: string;
+      };
+      update_training_program: {
+        Args: {
+          p_program_id: string;
+          p_name: string;
+          p_start_date: string;
+          p_week_count: number;
+        };
+        Returns: undefined;
+      };
+      update_planned_workout: {
+        Args: {
+          p_planned_workout_id: string;
+          p_instructions: string;
+          p_exercises: Json;
+        };
+        Returns: undefined;
+      };
+      submit_product_feedback: {
+        Args: {
+          p_page_url: string;
+          p_message: string;
         };
         Returns: string;
       };
@@ -472,3 +526,5 @@ export type WorkoutSession =
   Database["public"]["Tables"]["workout_sessions"]["Row"];
 export type ActualSet =
   Database["public"]["Tables"]["actual_sets"]["Row"];
+export type UserFeedback =
+  Database["public"]["Tables"]["user_feedback"]["Row"];
