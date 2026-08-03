@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { signOutAction } from "@/features/auth/actions";
 import {
   deleteConstraintAction,
   deleteGoalAction,
@@ -17,6 +16,7 @@ import {
   sexOptions,
 } from "@/features/onboarding/schemas";
 import { DestructiveActionForm } from "@/features/shared/destructive-action-form";
+import { AppHeader } from "@/features/shared/app-header";
 import { requireUser } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = {
@@ -74,32 +74,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-slate-100">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <Link
-            className="text-sm font-bold tracking-[0.14em] text-teal-800 uppercase"
-            href="/dashboard"
-          >
-            AI Fitness Trainer
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              className="text-sm font-semibold text-slate-600 hover:text-slate-950"
-              href="/settings"
-            >
-              Настройки
-            </Link>
-            <form action={signOutAction}>
-              <button
-                className="text-sm font-semibold text-slate-600 hover:text-slate-950"
-                type="submit"
-              >
-                Выйти
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       <div className="mx-auto max-w-6xl px-5 py-10">
         <div className="mb-8">
@@ -275,11 +250,44 @@ export default async function DashboardPage() {
           </section>
         </div>
 
-        <aside className="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-sm leading-6 text-slate-600">
-          На следующем этапе появятся заранее подготовленная
-          тренировочная программа и журнал выполнения. Автоматическое
-          построение и изменение программ пока не подключены.
-        </aside>
+        <section className="mt-6 grid gap-5 md:grid-cols-3">
+          <Link
+            className="rounded-2xl border border-teal-200 bg-teal-50 p-6 transition hover:border-teal-400"
+            href="/today"
+          >
+            <p className="text-sm font-semibold text-teal-700">Тренировка</p>
+            <h2 className="mt-2 text-xl font-bold text-slate-950">
+              Что запланировано сегодня
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Откройте тренировку и запишите выполненные подходы.
+            </p>
+          </Link>
+          <Link
+            className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-teal-400"
+            href="/program"
+          >
+            <p className="text-sm font-semibold text-teal-700">План</p>
+            <h2 className="mt-2 text-xl font-bold text-slate-950">
+              Моя программа
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Фазы, недели, тренировки и упражнения в одном месте.
+            </p>
+          </Link>
+          <Link
+            className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-teal-400"
+            href="/history"
+          >
+            <p className="text-sm font-semibold text-teal-700">Факт</p>
+            <h2 className="mt-2 text-xl font-bold text-slate-950">
+              История тренировок
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Сохранённые подходы, рабочие веса, RPE и комментарии.
+            </p>
+          </Link>
+        </section>
       </div>
     </main>
   );

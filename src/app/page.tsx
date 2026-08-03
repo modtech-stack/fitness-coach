@@ -71,12 +71,13 @@ export default async function Home({ searchParams }: HomePageProps) {
               Основа первого рабочего продукта
             </p>
             <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-6xl">
-              Начните с профиля, цели и реальных ограничений.
+              От профиля до первой выполненной тренировки.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
               AI Fitness Trainer сохраняет базовый контекст и защищает
-              его на уровне базы данных. Генерация программ и
-              автоматическая адаптация появятся на следующих этапах.
+              его на уровне базы данных. Добавьте подготовленную программу,
+              запишите фактические подходы и отслеживайте историю. Генерация
+              и автоматическая адаптация программ пока не подключены.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               {actions.map((action) => (
@@ -120,6 +121,11 @@ export default async function Home({ searchParams }: HomePageProps) {
                   "04",
                   "Ограничения",
                   "Только ваши записи, изолированные правилами доступа",
+                ],
+                [
+                  "05",
+                  "Тренировочный цикл",
+                  "Подготовленная программа, тренировка на сегодня и история",
                 ],
               ].map(([number, title, description]) => (
                 <li className="flex gap-4" key={number}>

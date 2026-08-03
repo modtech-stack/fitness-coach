@@ -60,6 +60,15 @@ describe("user interface contract", () => {
     expect(source).toContain('href="/settings"');
   });
 
+  it("sends a newly registered user to profile setup", () => {
+    const source = readSource("src/features/auth/actions.ts");
+
+    expect(source).toContain(
+      "auth/confirm?next=/onboarding/profile",
+    );
+    expect(source).toContain('redirect("/onboarding/profile")');
+  });
+
   it("keeps the service-role key out of client modules", () => {
     const clientModules = [
       "src/features/auth/auth-form.tsx",
