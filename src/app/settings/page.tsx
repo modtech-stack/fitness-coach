@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { AccountDeletionForm } from "@/features/account/account-deletion-form";
 import { signOutAction } from "@/features/auth/actions";
+import { AppHeader } from "@/features/shared/app-header";
 import { requireUser } from "@/lib/auth/require-user";
 
 export const metadata: Metadata = {
@@ -15,8 +16,9 @@ export default async function SettingsPage() {
   const { user } = await requireUser();
 
   return (
-    <main className="min-h-screen bg-slate-100 px-5 py-10">
-      <div className="mx-auto max-w-2xl">
+    <main className="min-h-screen bg-slate-100">
+      <AppHeader />
+      <div className="mx-auto max-w-2xl px-5 py-10">
         <Link
           className="text-sm font-semibold text-teal-700 hover:text-teal-900"
           href="/dashboard"

@@ -47,7 +47,7 @@ export async function signUpAction(
   const { data, error } = await supabase.auth.signUp({
     ...parsed.data,
     options: {
-      emailRedirectTo: `${getSiteUrl()}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: `${getSiteUrl()}/auth/confirm?next=/onboarding/profile`,
     },
   });
 
@@ -66,7 +66,7 @@ export async function signUpAction(
     };
   }
 
-  redirect("/dashboard");
+  redirect("/onboarding/profile");
 }
 
 export async function signInAction(
