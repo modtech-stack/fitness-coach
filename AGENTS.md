@@ -28,6 +28,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - выполняет пользовательские действия через UI;
 - проверяет результат после перезагрузки;
+- проверяет реальные интеграции, включая Supabase, формы и server actions;
 - когда релевантно, сверяет фактическое состояние Supabase;
 - проверяет ошибки, негативные сценарии, desktop и mobile;
 - для функций, зависящих от облачной инфраструктуры, по возможности проверяет
@@ -47,13 +48,12 @@ states, discoverability, редактирование, когнитивную н
 
 Каждое замечание классифицируется как `BLOCKER`, `MAJOR` или `MINOR`. Все `BLOCKER`
 и `MAJOR` должны быть исправлены Implementer и повторно проверены Functional QA до
-handoff, если только владелец явно не согласовал открытый `MAJOR`. UX Reviewer не
-расширяет scope продукта без обоснования.
+handoff владельцу. UX Reviewer не расширяет scope продукта без обоснования.
 
 ## Code Reviewer
 
-После Functional QA и UX review независимо проверяет соответствие задаче,
-регрессии, безопасность, RLS, server/client boundaries, migration safety,
+После Functional QA и UX review независимо проверяет архитектуру, соответствие
+задаче, регрессии, безопасность, RLS, server/client boundaries, migration safety,
 обработку ошибок, секреты, тестовое покрытие и ненужное усложнение. Если доступен
 GitHub Codex Review, дополнительно запроси его для PR.
 
@@ -64,8 +64,7 @@ GitHub Codex Review, дополнительно запроси его для PR.
 - TypeScript, ESLint, unit tests, database/RLS tests и production build — `PASS`;
 - миграции проверены;
 - основные acceptance-сценарии реально пройдены, включая persistence;
-- UX review выполнен, `BLOCKER = 0`, `MAJOR = 0` или открытые `MAJOR` явно
-  согласованы владельцем;
+- UX review выполнен, `BLOCKER = 0`, `MAJOR = 0`;
 - code review не содержит открытых критических замечаний.
 
 При замечании цикл выглядит так:
