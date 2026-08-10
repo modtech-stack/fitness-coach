@@ -1,12 +1,15 @@
 # AI Fitness Trainer
-# Database Schema v1.2
+# Database Schema v1.3
 
 > **Статус реализации:** Этап 1 реализует минимальный домен
 > `profiles`, `goals`, `constraints` в миграции
 > [`supabase/migrations/20260727130000_domain_foundation.sql`](../supabase/migrations/20260727130000_domain_foundation.sql).
 > Stage 2 реализует план и факт тренировочного процесса в миграции
 > [`supabase/migrations/20260803120000_training_workflow_foundation.sql`](../supabase/migrations/20260803120000_training_workflow_foundation.sql).
-> Recovery Metrics, Feedback, Program Review и Training Recommendation
+> Stage 2.1 добавляет ограниченное редактирование плана и журнал продуктовой
+> обратной связи в миграции
+> [`supabase/migrations/20260803180000_stage_2_1_training_workflow_ux.sql`](../supabase/migrations/20260803180000_stage_2_1_training_workflow_ux.sql).
+> Recovery Metrics, тренировочный Feedback, Program Review и Training Recommendation
 > остаются целевой моделью следующих этапов.
 
 > **Stage 1.5:** миграция
@@ -300,9 +303,11 @@ PostgreSQL; `service_role` key не передаётся в браузер.
 не позволяют связать строки разных пользователей. RLS разрешает роли
 `authenticated` читать только свои строки, а `anon` не получает доступа.
 Прямое изменение тренировочных таблиц клиентом запрещено: разрешённые
-записи выполняют только проверяющие функции `create_starter_program()` и
-`complete_workout()`. Удаление пользователя каскадно удаляет программу и
-историю.
+записи выполняют только проверяющие функции `create_starter_program()`,
+`update_training_program()`, `update_planned_workout()` и
+`complete_workout()`. Редактирование плановой тренировки блокируется после
+появления `workout_session`; фактические подходы не перезаписываются.
+Удаление пользователя каскадно удаляет программу и историю.
 
 
 ---
@@ -325,16 +330,23 @@ Recovery Metrics
 
 ---
 
-# 16. Feedback
+# 16. Product Feedback
 
+`user_feedback` — минимальный append-only журнал замечаний к продукту.
 
-Обратная связь пользователя.
+Хранит:
 
+- `user_id` из текущей Auth-сессии;
+- относительный URL страницы;
+- текст сообщения;
+- дату и время создания.
 
-Используется для:
+Клиент не получает прямых прав на таблицу. Функция
+`submit_product_feedback()` проверяет `auth.uid()`, внутренний URL и длину
+сообщения. Статусы, приоритеты и workflow тикетов в Stage 2.1 не добавляются.
 
-- корректировки программы;
-- обучения персонального профиля.
+Отдельная обратная связь о самочувствии и выполненной тренировке остаётся
+будущей доменной сущностью для Training Engine.
 
 
 ---

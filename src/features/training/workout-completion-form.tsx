@@ -23,12 +23,20 @@ export function WorkoutCompletionForm({
     <form action={formAction} className="mt-8 space-y-8">
       <input name="workout_id" type="hidden" value={workoutId} />
 
+      <section className="rounded-2xl border border-teal-200 bg-teal-50 p-5 text-sm leading-6 text-teal-950 sm:p-6">
+        <p className="font-bold">Что записывать</p>
+        <p className="mt-2">
+          Записывайте только рабочие подходы. Разминочные подходы не считаются и
+          не нужно их добавлять.
+        </p>
+      </section>
+
       {exercises.map((exercise) => (
         <fieldset
-          className="surface-card"
+          className="surface-card min-w-0"
           key={exercise.id}
         >
-          <legend className="px-1 text-lg font-bold text-slate-950">
+          <legend className="max-w-full px-1 text-lg font-bold break-words text-slate-950 [overflow-wrap:anywhere]">
             {exercise.exercise_order}. {exercise.name}
           </legend>
           <p className="mt-2 text-sm text-slate-600">
@@ -46,8 +54,7 @@ export function WorkoutCompletionForm({
 
           <div className="mt-5 space-y-3">
             <p className="text-sm text-slate-500">
-              Заполняйте только выполненные подходы. Невыполненные строки можно
-              оставить пустыми.
+              Невыполненные строки можно оставить пустыми.
             </p>
             {Array.from({ length: exercise.planned_sets }, (_, index) => {
               const setNumber = index + 1;
@@ -55,7 +62,7 @@ export function WorkoutCompletionForm({
 
               return (
                 <div
-                  className="grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-[auto_1fr_1fr_1fr] sm:items-end"
+                  className="grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-[auto_1fr_1fr_1fr] sm:items-end sm:p-4"
                   key={rowId}
                 >
                   <p className="pb-2 text-sm font-bold text-slate-700">
