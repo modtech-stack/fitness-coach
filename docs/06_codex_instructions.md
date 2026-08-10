@@ -321,6 +321,10 @@ Implementer:
 6. проверить ошибки и негативный сценарий;
 7. проверить пользовательские экраны на desktop и mobile.
 
+Проверка выполняется на реальных путях интеграции приложения, включая Supabase,
+формы и server actions. Подмена этих путей unit-тестами не подтверждает
+работоспособность пользовательского сценария.
+
 Для CRUD проверяется полный цикл:
 
 `create → read → update → reload → delete → persistence check`.
@@ -362,13 +366,13 @@ production-like среде: Vercel Preview с hosted development Supabase.
 - `MINOR` — улучшение, не блокирующее использование.
 
 Все `BLOCKER` и `MAJOR` исправляются Implementer и повторно проверяются Functional
-QA до handoff. Открытый `MAJOR` допускается только после явного согласования с
-владельцем. UX Reviewer не расширяет scope продукта без обоснования.
+QA до handoff владельцу. UX Reviewer не расширяет scope продукта без обоснования.
 
 ## 10.4. Code Reviewer
 
 После функционального и UX review отдельный Code Reviewer проверяет:
 
+- архитектуру;
 - соответствие задаче и отсутствие несогласованного scope;
 - регрессии;
 - безопасность и RLS;
@@ -398,7 +402,7 @@ QA до handoff. Открытый `MAJOR` допускается только п
 - persistence проверен;
 - UX review выполнен;
 - `BLOCKER = 0`;
-- `MAJOR = 0` либо открытые `MAJOR` явно согласованы владельцем;
+- `MAJOR = 0`;
 - code review не содержит открытых критических замечаний.
 
 Self-review Implementer не заменяет Functional QA или UX Review. Автоматические
