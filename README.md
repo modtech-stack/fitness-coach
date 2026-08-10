@@ -94,6 +94,11 @@ pnpm db:test
 
 `pnpm db:test` требует запущенный локальный Supabase. Тесты проверяют CRUD собственных данных, запрет изменения чужих записей, единственность активной основной цели, создание и безопасное редактирование структуры программы, рабочие веса, неизменяемость завершённой тренировки, feedback, атомарную запись результата, каскадное удаление и RLS всех пользовательских таблиц.
 
+Продуктовые изменения перед передачей владельцу проходят обязательный независимый
+workflow: Implementer, Functional QA, UX Review и Code Review. Полные критерии
+Quality Gate и формат handoff описаны в
+[Codex Development Instructions](docs/06_codex_instructions.md).
+
 ## Публикация через hosted Supabase и Vercel
 
 ### 1. Подготовить Supabase
@@ -208,6 +213,7 @@ pnpm db:test
 5. [Architecture Decisions](docs/DECISIONS.md)
 6. [Database Schema](docs/04_database_schema.md)
 7. [Implementation Plan](docs/08_implementation_plan.md)
-8. [Training Engine Principles](knowledge/training/training_engine_principles_v0.9.md)
+8. [Codex Development Instructions](docs/06_codex_instructions.md)
+9. [Training Engine Principles](knowledge/training/training_engine_principles_v0.9.md)
 
 Ветка `main` является единственным источником актуальной документации. Реальные медицинские, биометрические, контактные и другие конфиденциальные данные в репозитории не хранятся.
