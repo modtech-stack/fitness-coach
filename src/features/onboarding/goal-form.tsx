@@ -6,7 +6,6 @@ import { saveGoalAction } from "@/features/onboarding/actions";
 import {
   goalPriorityOptions,
   goalStatusOptions,
-  goalTypeOptions,
 } from "@/features/onboarding/schemas";
 import {
   FieldError,
@@ -31,25 +30,11 @@ export function GoalForm({
     <form action={formAction} className="space-y-5">
       <input type="hidden" name="next" value={nextPath} />
       {goal ? <input type="hidden" name="id" value={goal.id} /> : null}
-
-      <div>
-        <label className="field-label" htmlFor="goal_type">
-          Тип цели
-        </label>
-        <select
-          className="field-input"
-          defaultValue={goal?.goal_type ?? "general_fitness"}
-          id="goal_type"
-          name="goal_type"
-        >
-          {goalTypeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <FieldError errors={state.errors?.goal_type} />
-      </div>
+      <input
+        name="goal_type"
+        type="hidden"
+        value={goal?.goal_type ?? "general_fitness"}
+      />
 
       <div>
         <label className="field-label" htmlFor="description">
@@ -60,10 +45,15 @@ export function GoalForm({
           id="description"
           maxLength={500}
           name="description"
-          placeholder="Например: тренироваться регулярно три раза в неделю"
+          placeholder="Например: стать сильнее и тренироваться регулярно три раза в неделю"
           required
           defaultValue={goal?.description ?? ""}
         />
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Опишите результат своими словами. Например: снизить вес без
+          потери сил, набрать мышечную массу или подготовиться к забегу
+          на 10 км.
+        </p>
         <FieldError errors={state.errors?.description} />
       </div>
 

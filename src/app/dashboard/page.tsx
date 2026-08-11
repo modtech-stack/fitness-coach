@@ -8,11 +8,9 @@ import {
 } from "@/features/onboarding/actions";
 import {
   activityOptions,
-  constraintTypeOptions,
   experienceOptions,
   goalPriorityOptions,
   goalStatusOptions,
-  goalTypeOptions,
   sexOptions,
 } from "@/features/onboarding/schemas";
 import { DestructiveActionForm } from "@/features/shared/destructive-action-form";
@@ -218,8 +216,8 @@ export default async function DashboardPage() {
                   key={goal.id}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <p className="font-semibold text-slate-950">
-                      {toLabel(goalTypeOptions, goal.goal_type)}
+                    <p className="break-words font-semibold text-slate-950 [overflow-wrap:anywhere]">
+                      {goal.description}
                     </p>
                     <span className="rounded-full bg-teal-50 px-2 py-1 text-xs font-bold text-teal-800">
                       {toLabel(
@@ -228,9 +226,6 @@ export default async function DashboardPage() {
                       )}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {goal.description}
-                  </p>
                   <p className="mt-3 text-xs font-semibold text-slate-500">
                     {toLabel(goalStatusOptions, goal.status)}
                   </p>
@@ -272,13 +267,7 @@ export default async function DashboardPage() {
                     className="rounded-xl border border-slate-200 p-4"
                     key={constraint.id}
                   >
-                    <p className="font-semibold text-slate-950">
-                      {toLabel(
-                        constraintTypeOptions,
-                        constraint.type,
-                      )}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                    <p className="break-words text-sm leading-6 text-slate-700 [overflow-wrap:anywhere]">
                       {constraint.description}
                     </p>
                     <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-3">

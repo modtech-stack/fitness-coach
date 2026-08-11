@@ -4,9 +4,6 @@ import { useActionState, useState } from "react";
 
 import { saveConstraintAction } from "@/features/onboarding/actions";
 import {
-  constraintTypeOptions,
-} from "@/features/onboarding/schemas";
-import {
   FieldError,
   FormMessage,
 } from "@/features/shared/form-feedback";
@@ -34,6 +31,11 @@ export function ConstraintForm({
       {constraint ? (
         <input type="hidden" name="id" value={constraint.id} />
       ) : null}
+      <input
+        name="type"
+        type="hidden"
+        value={constraint?.type ?? "other"}
+      />
 
       {!constraint && allowNoConstraints ? (
         <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -62,51 +64,24 @@ export function ConstraintForm({
         className="space-y-5 disabled:opacity-45"
         disabled={hasNoConstraints}
       >
-        <fieldset>
-          <legend className="field-label">Тип ограничения</legend>
-          <div className="space-y-2">
-            {constraintTypeOptions.map((option) => (
-              <label
-                className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 has-checked:border-teal-600 has-checked:bg-teal-50"
-                key={option.value}
-              >
-                <input
-                  className="mt-1 size-4 shrink-0 accent-teal-700"
-                  defaultChecked={
-                    (constraint?.type ?? "schedule") ===
-                    option.value
-                  }
-                  name="type"
-                  type="radio"
-                  value={option.value}
-                />
-                <span>
-                  <span className="block font-semibold text-slate-900">
-                    {option.label}
-                  </span>
-                  <span className="mt-1 block text-sm leading-6 text-slate-600">
-                    {option.examples}
-                  </span>
-                </span>
-              </label>
-            ))}
-          </div>
-          <FieldError errors={state.errors?.type} />
-        </fieldset>
-
         <div>
           <label className="field-label" htmlFor="constraint_description">
-            Описание
+            Что важно учесть?
           </label>
           <textarea
             className="field-input min-h-28 resize-y"
             id="constraint_description"
             maxLength={500}
             name="description"
-            placeholder="Например: в будни на тренировку доступно не больше часа"
+            placeholder="Например: иногда болит правое колено; дома есть только гантели; в будни доступно не больше часа"
             required={!hasNoConstraints}
             defaultValue={constraint?.description ?? ""}
           />
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Добавьте одно ограничение за раз: боль или травму, доступное
+            время, оборудование либо бытовые условия. После сохранения
+            можно добавить следующее.
+          </p>
           <FieldError errors={state.errors?.description} />
         </div>
       </fieldset>
@@ -129,7 +104,7 @@ export function ConstraintForm({
             ? "Сохранить изменения"
             : allowNoConstraints
               ? "Сохранить и завершить настройку"
-              : "Создать ограничение"}
+              : "Добавить ограничение"}
       </button>
     </form>
   );
