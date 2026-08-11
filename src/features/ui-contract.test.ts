@@ -27,6 +27,32 @@ describe("user interface contract", () => {
     ).not.toMatch(/severity|Важность/u);
   });
 
+  it("uses free text as the primary goal and constraint input", () => {
+    const goalForm = readSource("src/features/onboarding/goal-form.tsx");
+    const constraintForm = readSource(
+      "src/features/onboarding/constraint-form.tsx",
+    );
+
+    expect(goalForm).toContain('name="goal_type"');
+    expect(goalForm).toContain('type="hidden"');
+    expect(goalForm).not.toContain("goalTypeOptions.map");
+    expect(goalForm).toContain("Опишите результат своими словами");
+
+    expect(constraintForm).toContain('name="type"');
+    expect(constraintForm).toContain('value={constraint?.type ?? "other"}');
+    expect(constraintForm).not.toContain("constraintTypeOptions.map");
+    expect(constraintForm).toContain("Добавьте одно ограничение за раз");
+  });
+
+  it("shows goal and constraint descriptions without taxonomy labels", () => {
+    const dashboard = readSource("src/app/dashboard/page.tsx");
+
+    expect(dashboard).not.toContain("goalTypeOptions");
+    expect(dashboard).not.toContain("constraintTypeOptions");
+    expect(dashboard).toContain("{goal.description}");
+    expect(dashboard).toContain("{constraint.description}");
+  });
+
   it("does not render the technical setup term", () => {
     const userFacingSources = [
       "src/app/page.tsx",
